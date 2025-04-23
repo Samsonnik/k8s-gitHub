@@ -1,0 +1,21 @@
+name: Run Self-Hosted Runner
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-job:
+
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Test Runner
+        run: |
+          echo "Self-hosted runner is working!"
+          echo "Running on host: $(hostname)"
+          echo "Current directory: $(pwd)"

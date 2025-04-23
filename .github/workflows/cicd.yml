@@ -14,8 +14,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Test Runner
-        run: |
-          echo "Self-hosted runner is working!"
-          echo "Running on host: $(hostname)"
-          echo "Current directory: $(pwd)"
+
+      - name: Check Docker version
+        run: docker --version || echo "Docker not found"

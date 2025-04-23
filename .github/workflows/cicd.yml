@@ -19,3 +19,15 @@ jobs:
         run: |
           cd 1.images/
           docker build -t github-front:latest .
+
+      - name: Log in to Docker Registry
+        run: |
+          echo "Logging into Docker Registry at docker-registry.docker-registry.svc.cluster.local:5000"
+          docker login docker-registry.docker-registry.svc.cluster.local:5000 \
+            --username "evgen" \
+            --password "evgen"
+
+      - name: Docker push
+        run: |
+          docker tag github-front:latest docker-registry.docker-registry.svc.cluster.local:5000/github-front:latest
+          docker push docker-registry.docker-registry.svc.cluster.local:5000/github-front:latest

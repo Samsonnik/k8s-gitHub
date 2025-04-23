@@ -30,7 +30,7 @@ jobs:
       - name: Log files in 1.images
         run: |
           echo "Files in /github/workspace/1.images:"
-          ls -la /1.images
+          ls -la /
 
       - name: Build and Push
         run: |

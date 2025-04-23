@@ -1,4 +1,4 @@
-name: Run Self-Hosted Runner with Kaniko
+name: Run Self-Hosted Runner
 
 on:
   push:
@@ -10,35 +10,24 @@ jobs:
   build-push-job:
 
     runs-on: self-hosted
-    container:
-      image: gcr.io/kaniko-project/executor:v1.20.0-debug
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Create Docker config.json
+      - name: Build docker image
         run: |
-          cat <<EOF > /kaniko/.docker/config.json
-          {
-            "auths": {
-              "docker-registry.docker-registry.svc.cluster.local:5000": {
-                "auth":  "$(echo -n "evgen:evgen" | base64 -w0)"
-              }
-            }
-          }
-          EOF
+          cd 1.images/
+          docker build -t github-front:latest .
 
-      - name: Log files in 1.images
+      - name: Log in to Docker Registry
         run: |
-          echo "Files in /github/workspace/1.images:"
-          ls -la /workspace
+          echo "Logging into Docker Registry at docker-registry.docker-registry.svc.cluster.local:5000"
+          docker login docker-registry.docker-registry.svc.cluster.local:5000 \
+            --username "evgen" \
+            --password "evgen"
 
-      - name: Build and Push
+      - name: Docker push
         run: |
-          /kaniko/executor \
-            --context "/github/workspace/1.images" \
-            --dockerfile "dockerfile" \
-            --destination "docker-registry.docker-registry.svc.cluster.local:5000/github-front:latest" \
-            --ignore-path=/product_uuid \
-            --ignore-path=/sys \
-            --ignore-path=/proc \
-            --insecure
+          docker tag github-front:latest docker-registry.docker-registry.svc.cluster.local:5000/github-front:latest
+          docker push docker-registry.docker-registry.svc.cluster.local:5000/github-front:latest

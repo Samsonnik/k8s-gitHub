@@ -31,8 +31,8 @@ jobs:
         run: |
           /kaniko/executor \
             --context=/1.images \
-            --dockerfile="/1.images/dockerfile" \
-            --destination=docker-registry.docker-registry.svc.cluster.local:5000/github-front:latest \
+            --dockerfile "./1.images/dockerfile" \
+            --destination "docker-registry.docker-registry.svc.cluster.local:5000/github-front:latest" \
             --ignore-path=/product_uuid \
             --ignore-path=/sys \
             --ignore-path=/proc \

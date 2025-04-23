@@ -15,20 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set Up Kaniko
-        uses: docker/setup-buildx-action@v2
-        with:
-          driver: kaniko
-
-      - name: Build and push with Kaniko
+      - name: Build docker image
         run: |
-          /kaniko/executor \
-            --context=./1.images/ \
-            --dockerfile=./1.images/dockerfile \
-            --destination=docker-registry.docker-registry.svc.cluster.local:5000/github-front:latest \
-            --insecure \
-            --skip-tls-verify \
-            --ignore-path=/product_uuid \
-            --ignore-path=/sys \
-            --ignore-path=/proc
-
+          cd 1.images/
+          docker build -t github-front:latest .

@@ -10,28 +10,30 @@ jobs:
   build-push-job:
 
     runs-on: self-hosted
+    container:
+      image: gcr.io/kaniko-project/executor:v1.20.0-debug
 
     steps:
-      # Шаг 1: Клонирование репозитория
-      - name: Checkout repository
-        uses: actions/checkout@v3
 
-      # Шаг 2: Логирование информации о среде выполнения
-      - name: Log environment details
+      - name: Create Docker config.json
         run: |
-          echo "Running on host: $(hostname)"
-          echo "Current directory: $(pwd)"
-          echo "Environment variables:"
-          printenv | grep -E 'RUNNER_|GITHUB_'
+          cat <<EOF > /kaniko/.docker/config.json
+          {
+            "auths": {
+              "docker-registry.docker-registry.svc.cluster.local:5000": {
+                "auth":  "$(echo -n "evgen:evgen" | base64 -w0)"
+              }
+            }
+          }
+          EOF
 
-      # Шаг 3: Сборка и отправка Docker-образа с помощью Kaniko
-      - name: Build and push with Kaniko
-        uses: gcr.io/kaniko-project/executor@latest
-        with:
-          context: ./1.images/
-          dockerfile: ./1.images/Dockerfile
-          destination: docker-registry.docker-registry.svc.cluster.local:5000/github-front:latest
-          username: evgen
-          password: evgen
-          insecure: true
-          skip-tls-verify: true
+      - name: Build and Push
+        run: |
+          /kaniko/executor \
+            --context=/1.images \
+            --dockerfile="/1.images/dockerfile" \
+            --destination=docker-registry.docker-registry.svc.cluster.local:5000/github-front:latest \
+            --ignore-path=/product_uuid \
+            --ignore-path=/sys \
+            --ignore-path=/proc \
+            --insecure

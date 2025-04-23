@@ -35,7 +35,7 @@ jobs:
       - name: Build and Push
         run: |
           /kaniko/executor \
-            --context "1.images" \
+            --context "/github/workspace/1.images" \
             --dockerfile "dockerfile" \
             --destination "docker-registry.docker-registry.svc.cluster.local:5000/github-front:latest" \
             --ignore-path=/product_uuid \
